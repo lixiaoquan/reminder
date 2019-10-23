@@ -19,6 +19,17 @@ def create_note(note_store, notebook_guid, title, content = None):
     note.content += '</en-note>'
     note_store.createNote(note)
 
+
+def generate_review_date(intervals, start):
+    review_date = []
+
+    for i in intervals:
+        review_date.append(start + datetime.timedelta(days=i))
+
+    # print(review_date)
+    return review_date
+
+
 fobj = open('/home/xiaoquan.li/.yx_token', 'r')
 token = fobj.readlines()[0][:-1]
 
@@ -61,5 +72,33 @@ for c in content:
 
 tomorrow = datetime.today() + timedelta(days=1)
 
+intervals = [3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45]
+
+intervals = [n - 1 for n in intervals]
+
+print(intervals)
+
+review_list = []
+
+print(today)
+
+for h in record:
+    # print(h.date)
+    a_datetime = datetime.datetime.strptime(h.time, "%Y-%m-%d")
+
+    if tomorrow in generate_review_date(intervals, a_datetime):
+        review_list.append(h)
+
+print("Today's review list:")
+content = ''
+for r in review_list:
+    print(r.name)
+    content += '<bin>'
+    content += r.name
+    content += '</bin>'
+
+if content == '':
+    content = '<bin> No review </bin>'
+
 # Create tomorrow's review list
-create_note(note_store, notebook_review.guid, tomorrow.strftime("%Y-%m-%d Highend English"), 'test')
+create_note(note_store, notebook_review.guid, tomorrow.strftime("%Y-%m-%d Highend English"), content)
