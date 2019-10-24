@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date, time
 import evernote.edam.type.ttypes as Types
 from evernote.api.client import EvernoteClient, NoteStore
 
@@ -24,7 +24,7 @@ def generate_review_date(intervals, start):
     review_date = []
 
     for i in intervals:
-        review_date.append(start + datetime.timedelta(days=i))
+        review_date.append(start + timedelta(days=i))
 
     # print(review_date)
     return review_date
@@ -70,7 +70,7 @@ for c in content:
         record.append(Study(tmp[0], tmp[1]))
 
 
-tomorrow = datetime.today() + timedelta(days=1)
+tomorrow = datetime.combine(date.today(), time.min) + timedelta(days=1)
 
 intervals = [3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45]
 
@@ -80,25 +80,23 @@ print(intervals)
 
 review_list = []
 
-print(today)
+print(tomorrow)
 
 for h in record:
-    # print(h.date)
-    a_datetime = datetime.datetime.strptime(h.time, "%Y-%m-%d")
-
-    if tomorrow in generate_review_date(intervals, a_datetime):
+    if tomorrow in generate_review_date(intervals, h.time):
         review_list.append(h)
 
 print("Today's review list:")
 content = ''
 for r in review_list:
     print(r.name)
-    content += '<bin>'
+    content += '<div>'
     content += r.name
-    content += '</bin>'
+    content += '</div>'
 
 if content == '':
-    content = '<bin> No review </bin>'
+    content = '<div> No review </div>'
 
 # Create tomorrow's review list
+# print(content)
 create_note(note_store, notebook_review.guid, tomorrow.strftime("%Y-%m-%d Highend English"), content)
